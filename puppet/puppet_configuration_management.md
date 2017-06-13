@@ -1,847 +1,3 @@
-#### Describe language features
-
-[Language: Basics](https://docs.puppetlabs.com/puppet/latest/reference/lang_summary.html)
-
-* Syntax inspired by the Nagios configuration file format
-
-* Resources, classes, and nodes
-
-    * core of the language is declaring resources
-
-    * groups of resources are organized into classes
-
-    * scope
-
-        * resource describes a file or package
-
-        * class describes a service or application
-
-        * larger classes describe entire system
-
-* Ordering
-
-    * variables must be declared before referenced
-
-* Files
-
-    * called manifests
-
-    * .pp extension
-
-    * must use UTF8 encoding
-
-    * may use Unix (LF) or Windows (CRLF) line breaks
-
-* Compilation and catalogs
-
-    * manifests can use conditional logic
-
-    * catalogs are static documents which contain resources and relationships
-
-        * will be in memory as a Ruby object, transmitted as JSON, and persisted to disk as YAML
-
-    * master server compiles catalogue for agent
-
-    * agent nodes cache their most recent catalog
-
-[Language: Node Definition](https://docs.puppet.com/puppet/latest/reference/lang_node_definitions.html)
-
-* Matching
-
-    * If there is a node definition with the node’s exact name, Puppet will use it.
-
-    * If there is a regular expression node statement that matches the node’s name, Puppet will use it. (If more than one regex node matches, Puppet will use one of them, with no guarantee as to which.)
-
-    * If the node’s name looks like a fully qualified domain name (i.e. multiple period-separated groups of letters, numbers, underscores and dashes), Puppet will chop off the final group and start again at step 1. (That is, if a definition for www01.example.com isn’t found, Puppet will look for a definition matching www01.example.)
-
-    * Puppet will use the default node.
-
-* Example
-
-    * Thus, for the node www01.example.com, Puppet would try the following, in order:
-
-        * www01.example.com
-
-        * A regex that matches www01.example.com
-
-        * www01.example
-
-        * A regex that matches www01.example
-
-        * www01
-
-        * A regex that matches www01
-
-        * default
-
-[Language: Reserved Words and Acceptable Names](https://docs.puppet.com/puppet/4.6/reference/lang_reserved.html)
-
-* Reserved words
-
-    * cannot be used as bare word strings
-
-        * you must quote these words if you wish to use them as strings
-
-    * cannot be used as names for custom fucntions
-
-    * cannot be used as names for classes
-
-    * cannot be used as names for custom resources types or defined resource types
-
-    * reserved words list
-
-        * and — expression operator
-
-        * case — language keyword
-
-        * class — language keyword
-
-        * default — language keyword
-
-        * define — language keyword
-
-        * else — language keyword
-
-        * elsif — language keyword
-
-        * false — boolean value
-
-        * if — language keyword
-
-        * in — expression operator
-
-        * import — language keyword
-
-        * inherits — language keyword
-
-        * node — language keyword
-
-        * or — expression operator
-
-        * true — boolean value
-
-        * undef — special value
-
-        * unless — language keyword
-
-        * Future use
-
-            * attr
-
-            * function
-
-            * type
-
-            * private
-
-* Reserved class names
-
-    * main
-
-        * Puppet automatically creates a **main **class, which contains any resources not contained by any other class
-
-    * settings
-
-        * automatically created namespace that contains variables with the settings available to the compiler
-
-            * puppet master settings
-
-* Reserved variable names
-
-    * **must not assign values to:**
-
-        * $string
-
-        * any variable consisting only of numbers (ie. $0)
-
-        * $trusted
-
-        * $facts
-
-* Variables, Classes, Types, Tags, Params and modules
-
-    * Begin with **$**
-
-    * Can include
-
-        * uppercase and lowercase letters
-
-        * numbers
-
-        * underscores
-
-* Classes and Types
-
-    * must begin with lowercase letter
-
-    * can contain
-
-        * lowercase letters
-
-        * numbers
-
-        * underscores
-
-[Language: Resources](https://docs.puppet.com/puppet/4.6/reference/lang_resources.html)
-
-* Syntax
-
-    * resource type
-
-    * an opening curly brace
-
-    * the title, which is a string
-
-    * a colon
-
-    * optionally, any number of attribute and value pairs
-
-        * a => arrow
-
-    * a trailing coma
-
-    * a closing curly brace
-
-    * type {'title':      attribute => value,    }
-
-* Type
-
-    * identifies what kind of resource it is
-
-* Title
-
-    * identifying string
-
-    * must be unique per resource type
-
-* Attributes
-
-    * describe the desired state of the resource
-
-    * each resource has its own set of available attributes
-
-* Behavior
-
-    * adds a resource to the catalog
-
-    * tells Puppet to manage that resource’s state
-
-    * when the catalog is compiled, it will
-
-        * read the actual state of the target resource
-
-        * compare the states
-
-        * if necessary, change the system to enforce the state
-
-    * events
-
-        * if Puppet changes a resource, it will log those changes as events
-
-            * these events will appear in the agent’s log and in the run report
-
-    * parse-order independence
-
-        * resources are not applied in the order they are written
-
-            * Puppet will apply the resources in whatever way is most efficient
-
-    * scope independence
-
-        * resources are not subject to scope
-
-    * containment
-
-        * resources may be contained by classes and defined types
-
-* Special attributes
-
-    * name
-
-        * can specify the name of the provider per platform (ntpd on RedHat and ntp on Debian; the title could be ntp)
-
-    * ensure
-
-        * manages the most fundamental aspect of the resource on the target system
-
-* Condensed forms
-
-    * array of titles
-
-        * file { ['/etc',            '/etc/rc.d',            '/etc/rc.d/rc6.d']:      ensure => directory,      owner  => 'root',      group  => 'root',      mode   => '0755',    }
-
-    * semicolon after attribute block
-
-        * file {      '/etc/rc.d':        ensure => directory,        owner  => 'root',        group  => 'root',        mode   => '0755';      '/etc/rc.d/init.d':        ensure => directory,        owner  => 'root',        group  => 'root',        mode   => '0755'; }
-
-    * resource defaults
-
-* Adding or Modifying attributes
-
-    * amending attributes with a reference
-
-        * file {'/etc/passwd':      ensure => file,    }    File['/etc/passwd'] {      owner => 'root',      group => 'root',      mode  => '0640',    }
-
-    * amending attributes with a collector
-
-        * class base::linux {      file {'/etc/passwd':        ensure => file,      }      ...    }    include base::linux    File <| tag == 'base::linux' |> {      owner => 'root',      group => 'root',      mode  => '0640',    }
-
-[Language: Relationships and Ordering](https://docs.puppet.com/puppet/4.6/reference/lang_relationships.html)
-
-* Syntax
-
-    * relationship metaparameters
-
-        * before
-
-            * causes a resource to be applied **before** the target resource
-
-        * require
-
-            * causes a resource to be applied **after** the target resource
-
-        * notify
-
-            * causes a resource to be applied **before** the target resource
-
-            * the target resource will refresh if the notifying resource changes
-
-        * subscribe
-
-            * cause a resource to be applied **after** the target resource
-
-            * the subscribing resource will refresh if the target resource changes
-
-    * chaining arrows
-
-        * -> (ordering arrow)
-
-            * applies the resource on the left before the right
-
-        * ~> (notification arrow)
-
-            * refreshes the event on the right if anything changes
-
-        * chained collectors
-
-            *    Yumrepo <| |> -> Package <| |>
-
-            * This example would apply all yum repository resources before applying any package resources, which protects any packages that rely on custom repos.
-
-    * the require function
-
-        * declares a class and causes it to become a dependency of the surrounding container
-
-        * example
-
-            * class wordpress {      require apache      require mysql      ...    }
-
-            * The above example would cause every resource in the apache and mysql classes to be applied before any of the resources in the wordpress class.
-
-* Behavior
-
-    * ordering and notification
-
-        * an ordering relationship ensures that one resource will be managed before another
-
-        * a notification relationship does the same, but also sends the latter resource a refresh event
-
-    * refreshing
-
-        * only built-in types that support refresh are **service, mount**, and **exec.**
-
-            * service
-
-                * restarts the service
-
-            * mount
-
-                * unmounting and then mounting their volume
-
-            * exec
-
-                * usually do not refresh
-
-                * refreshonly => true
-
-                    * causes the exec to never fire unless it receives a refresh event.
-
-    * autorequire
-
-        * creates an ordering relationship without the user explicitly stating one
-
-        * done when applying a catalog
-
-    * parse-order independence
-
-        * relationships are not limited by parse-order
-
-        * you can declare a relationship with a resource before that resource has been declared
-
-[Langauge: Resource Defaults](https://docs.puppet.com/puppet/4.6/reference/lang_defaults.html)
-
-* Lets you set default attribute values for a given resource type
-
-* Syntax example
-
-    * Exec {      path        => '/usr/bin:/bin:/usr/sbin:/sbin',      environment => 'RUBYLIB=/opt/puppet/lib/ruby/site_ruby/1.8/',      logoutput   => true,      timeout     => 180,    }
-
-[Language: Variables](https://docs.puppet.com/puppet/4.6/reference/lang_variables.html)
-
-* Syntax
-
-    * assignment
-
-        * $content = "some content\n"
-
-    * resolution
-
-        * file {'/tmp/testing':      ensure  => file,      content => $content,    }    $address_array = [$address1, $address2, $address3]
-
-    * interpolation
-
-        * $rule = "Allow * from $ipaddress"    file { "${homedir}/.vim":      ensure => directory,      ...    }
-
-    * appending assignments
-
-        * $ssh_users = ['myself', 'someone']    class test {      $ssh_users += ['someone_else']    }
-
-* Behavior
-
-    * scope
-
-        * area of code where a given variable is visible
-
-    * accessing out-of-scope variables
-
-        * use fully qualified names 
-
-            * $vhostdir = $appache::params::vhostdir
-
-    * no reassignment
-
-        * the value is dependent on the scope
-
-        * the value can be different at a lower scope
-
-    * variables are parse-order dependent
-
-[Language: Tags](https://docs.puppetlabs.com/puppet/latest/reference/lang_tags.html)
-
-* Assigning tags to resources
-
-    * automatic tagging
-
-        * every resource automatically receives the following tags
-
-            * its resource type
-
-            * the full name of the class or defined type
-
-            * every namespace segment 
-
-    * containment
-
-        * tags are passed along by containment
-
-            * a resource will receive all of the tags from the class and or defined type that contains it
-
-            *  In the case of nested containment (e.g. a class that declares a defined resource, or a defined type that declares other defined resources), a resource will receive tags from all of its containers.
-
-    * tag metaparameter
-
-        * accepts a single tag or an array
-
-    * tag function
-
-        * assigns tags to the surrounding container and all of the resources it contains
-
-        * class role::public_web {  tag 'us_mirror1', 'us_mirror2'  apache::vhost {'docs.puppetlabs.com':    port => 80,  }  ssh::allowgroup {'www-data': }  @@nagios::website {'docs.puppetlabs.com': }}
-
-* Using tags
-
-    * collecting resources
-
-        * tags can be used as an attribute in the search expression of a resource collector
-
-            * most useful for realizing virtual and exported resources
-
-            * realizing
-
-                * realize(User['deploy'], User['zleslie'])
-
-[Language: Facts and Built-in Variables](https://docs.puppet.com/puppet/4.6/reference/lang_facts_and_builtin_vars.html)
-
-* Puppet collects system information with Facter
-
-    * build-in core facts
-
-    * any custom facts or external facts
-
-* Data types
-
-    * 4.6 version of Puppet supports facts values of any data type
-
-    * handling string-only facts
-
-        * older versions of Puppet would always convert all fact values to strings
-
-        * third-party modules such as stdlib can help
-
-* Accessing facts from Puppet code
-
-    * classic $fact_name facts
-
-        * appear in Puppet as top-scope variables
-
-        * works in all versions of Puppet
-
-        * not immediately obvious you’re using a fact
-
-    * the $facts[‘fact_name’] hash
-
-        * may or may not be enabled by default
-
-            * trusted_node_data
-
-        * more readable and maintainable code
-
-        * only works with Puppet 3.5 or later and only when enabled
-
-[Language: Scope](https://docs.puppet.com/puppet/4.6/reference/lang_scope.html)
-
-* Scope basics
-
-    * specific area of code which is partially isolated from other areas of code
-
-        * limited reach of variables and resource defaults
-
-    * any given scope has access to its own contents and also receives additional contents from its parent scope
-
-    * scope does not limit the reach of
-
-        * resource titles (global)
-
-        * resource references
-
-    * top scope
-
-        * code that is outside any class definition, type definition, or node definitions. 
-
-        * also facter
-
-    * node scope
-
-        * code that is inside a node definition
-
-    * local scope
-
-        * code inside a class definition or defined type
-
-* More details
-
-    * scope of external node classifier data
-
-        * variables provide by the ENC are set at top scope
-
-        * all classes assigned by an ENC are declared at node scope
-
-    * named scopes and anonymous scopes
-
-        * a class definition creates a named scope
-
-        * top scope is also a named scope (empty string or $::)
-
-        * node scopes and the local scopes created by defined resources are anonymous and cannot be directly referenced
-
-* Scope Lookup Rules
-
-    * The scope lookup rules determine when a local scope becomes the parent of another local scope
-
-    * Two sets of scope lookup rules
-
-        * static scope
-
-            * parent scopes are only assigned by class inheritance (inherits keyword).
-
-            * any derived class receives the contents of its base class in addition to the contents of node and top scope
-
-            * all other local scopes have no parents
-
-        * dynamic scope
-
-            * parent scopes are assigned by both inheritance and declaration
-
-            * each scope has only one parent
-
-            * the parent of a derived class is its base class
-
-            * the parent of any other class or defined resource is the first scope in which it was declared
-
-            * example:
-
-            * include dynamic    class dynamic {      $var = "from dynamic"      include included    }    class included {      notify { $var: } # dynamic lookup will end up finding "from dynamic"                       # this will change to being undefined    }
-
-* Messy under-the-hood details
-
-    * node scope only exists if there is at least one node definition in the site manifest
-
-[Language: Conditional Statements](https://docs.puppet.com/puppet/4.6/reference/lang_conditional.html)
-
-* if statement
-
-    *   if str2bool("$is_virtual") {      warning('Tried to include class ntp on virtual machine; this node may be misclassified.')    }    elsif $operatingsystem == 'Darwin' {      warning('This NTP module does not yet work on our Mac laptops.')    }    else {      include ntp    }
-
-* unless
-
-    * unless $memorysize > 1024 {      $maxclient = 500    }
-
-* case statement
-
-    * case $operatingsystem {      'Solaris':          { include role::solaris }      'RedHat', 'CentOS': { include role::redhat  }      /^(Debian|Ubuntu)$/:{ include role::debian  }      default:            { include role::generic }    }
-
-* selector
-
-    * $rootgroup = $osfamily ? {        'Solaris'          => 'wheel',        /(Darwin|FreeBSD)/ => 'wheel',        default            => 'root',    }    file { '/etc/passwd':      ensure => file,      owner  => 'root',      group  => $rootgroup,    }
-
-[Language: Expressions](https://docs.puppet.com/puppet/4.6/reference/lang_expressions.html)
-
-* Comparison operators
-
-    * ==
-
-        * returns true if the operands are equal
-
-        *  if $::osfamily == ‘Debian’ { } 
-
-    * !=
-
-        * not equal
-
-        * if $::kernel != ‘Linux’ { } 
-
-    * <, >, <=, >=
-
-        * if $::uptime_days > 365 { }
-
-    * =~ 
-
-        * Regex match compress a string (left operator) with a regular expression operator and resolve true if it maches. 
-
-        * if $::ipaddress =~ /^10\./ { } 
-
-    * !~
-
-        * Regex not match 
-
-        * Resolves false if operands match	
-
-    * in
-
-        * resolves to true if the right operand contains the left operand
-
-* Boolean operator
-
-    * and
-
-        * resolves to true if both operands are true
-
-    * or
-
-        * resolves to true if either operand is true
-
-    * ! (not)
-
-        * resolves to true if the operand is false
-
-        * or resolves to false if the operand is true 
-
-* Arithmetic operators
-
-    * + addition
-
-    * - subtraction
-
-    * / division
-
-    * * multiplication
-
-    * % modulo
-
-        * resolves to the remainder of dividing
-
-    * <<  (left shift)
-
-    * >> right shift
-
-[Language: Function](https://docs.puppet.com/puppet/4.6/reference/lang_functions.html)[s](https://docs.puppet.com/puppet/4.6/reference/lang_functions.html)
-
-* Functions
-
-    * pre-defined chunks of Ruby code which run during compilation
-
-    * most functions return values or modify the catalog
-
-    * Puppet includes several built-in functions, and more are available in modules on the Puppet Forge.
-
-    * You can also write custom functions and put them in your modules
-
-#### Identify the core resource types
-
-[Type Reference](https://docs.puppet.com/puppet/4.6/reference/type.html)
-
-* Most common resource types
-
-    * augeas
-
-    * cron
-
-    * exec
-
-    * file
-
-    * filebucket
-
-        * backup location
-
-    * group
-
-    * host
-
-        * /etc/host entry
-
-    * mount
-
-    * notify
-
-    * package
-
-    * service
-
-    * stage
-
-    * user
-
-#### Demonstrate knowledge of classes and defines
-
-[Language: Classes](https://docs.puppet.com/puppet/4.6/reference/lang_classes.html)
-
-* Defining classes
-
-    * syntax
-
-        * class base_class::subclass (	$optional_params = ‘something’,){	type { ‘title’:		attribute => ‘value’,	}}
-
-    * parameters
-
-        * allow a class to request external data
-
-    * location
-
-        * class definitions should be stored in modules
-
-            * under the manifests/ directory
-
-        * Puppet is automatically aware of classes in modules and can autoload them by name
-
-    * containment
-
-        * a class contains all of its resources
-
-    * auto-tagging
-
-        * every resource in a class gets automatically tagged
-
-    * inheritance
-
-        * classes can be derived from other classes using the *inherits* keyword
-
-        * the base class becomes the parent scope of the derived class. 
-
-        * the new class receives a copy of all of the base class’s variables and resource defaults
-
-        * code in the derived class can override any resource attributes at the base class
-
-    * declaring a class
-
-        * include like
-
-            * functions
-
-                * include
-
-                * require
-
-                * contain
-
-                    * to be used inside another class definition
-
-                    * it declares one or more classes, then causes them to become contained by the surrounding class
-
-                * hiera_include
-
-            * can safely declare a class multiple times
-
-        * resource like
-
-            * class something { }
-
-            * supports parameters
-
-L[earning Puppet - Defined Types](https://docs.puppetlabs.com/learning/definedtypes.html)
-
-* Defined resource types
-
-    * blocks of puppet code that can be evaluated multiple times with different parameters
-
-    * example:
-
-        * # /etc/puppetlabs/puppet/modules/apache/manifests/vhost.ppdefine apache::vhost (Integer $port, String[1] $docroot, String[1] $servername = $title, String $vhost_name = '*') {  include apache # contains Package['httpd'] and Service['httpd']  include apache::params # contains common config settings  $vhost_dir = $apache::params::vhost_dir  file { "${vhost_dir}/${servername}.conf":    content => template('apache/vhost-default.conf.erb'),      # This template can access all of the parameters and variables from above.    owner   => 'www',    group   => 'www',    mode    => '644',    require => Package['httpd'],    notify  => Service['httpd'],  }}
-
-### Modules
-
-#### Describe how to use modules from the Forge
-
-[Installing Modules](https://docs.puppetlabs.com/puppet/latest/reference/modules_installing.html)
-
-* About puppet module
-
-    * Puppet Forge
-
-        * a repository of modules written both by Puppet and by the Puppet user community.
-
-    * tool provides a command line interface for managing modules from the Forge.
-
-* Finding Forge modules
-
-    * You can browse the Puppet Forge by Web
-
-    * puppet module search SEARCHTERM
-
-* Installing modules
-
-    * puppet module install author-modulename
-
-        * --target-dir
-
-            * specify a target directory for installation
-
-        * --environment
-
-            * install into a different environment
-
-        * --module_repository
-
-        * can also specify a tarball
-
-* List modules
-
-    * puppet modules list
-
-* Uninstalling modules
-
-    * puppet module uninstall MODULENAME
-
 #### Demonstrate knowledge of module structure
 
 [Module Fundamentals](https://docs.puppetlabs.com/puppet/latest/reference/modules_fundamentals.html)
