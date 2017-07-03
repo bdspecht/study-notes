@@ -1,1 +1,2 @@
-My notes from studying for the Puppet Professional certification.
+# Puppet certified professional
+Study notes from preparring for the Puppet certification
