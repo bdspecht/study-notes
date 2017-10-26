@@ -89,6 +89,14 @@ Differences between CI and CD
   yum-config-manager --disable jenkins
   ```
 
+* Setup alternatives 
+
+  ```shell
+   alternatives --install /usr/bin/java java /usr/java/latest/bin/java 200000
+   alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 200000
+   alternatives --install /usr/bin/jar jar /usr/java/latest/bin/jar 200000
+  ```
+
 * Enable the service to start on boot 
 
   ```shell
@@ -99,4 +107,32 @@ Differences between CI and CD
 * Go to the Web GUI, set the password, and follow the setup wizard
 
 
+#### User Management and Security
+
+* Need to understand Jenkins user database for certification
+  * Should still be aware of other options (servlet container, LDAP, Unix user/group db)
+* Lots of questions on matrix based security
+  * Permissions based on contexts (credentials, agents/slaves, jobs, etc...)
+    * Job and project interchangeable
+    * Agent and slave interchangeable
+
+#### Adding a Jenkins Slave
+
+* Add slaves when the monothlic instance can no longer handle the load
+
+* Create a jenkins user on the slave and copy over the public key from the master
+
+  ```shell
+   useradd -d /var/lib/jenkins jenkins
+  ```
+
+* Setup alternatives and install java
+
+  ```shell
+  alternatives --install /usr/bin/java java /usr/java/latest/bin/java 200000 
+  alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 200000 
+  alternatives --install /usr/bin/jar jar /usr/java/latest/bin/jar 200000
+  ```
+
+* Check nodes view to see the status once the slave is launched
 
