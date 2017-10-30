@@ -89,7 +89,7 @@ Differences between CI and CD
   yum-config-manager --disable jenkins
   ```
 
-* Setup alternatives 
+* Setup alternatives
 
   ```shell
    alternatives --install /usr/bin/java java /usr/java/latest/bin/java 200000
@@ -97,7 +97,7 @@ Differences between CI and CD
    alternatives --install /usr/bin/jar jar /usr/java/latest/bin/jar 200000
   ```
 
-* Enable the service to start on boot 
+* Enable the service to start on boot
 
   ```shell
   systemctl enable jenkins
@@ -129,10 +129,26 @@ Differences between CI and CD
 * Setup alternatives and install java
 
   ```shell
-  alternatives --install /usr/bin/java java /usr/java/latest/bin/java 200000 
+  alternatives --install /usr/bin/java java /usr/java/latest/bin/java 200000
   alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 200000 
   alternatives --install /usr/bin/jar jar /usr/java/latest/bin/jar 200000
   ```
 
 * Check nodes view to see the status once the slave is launched
 
+#### Plugin manager
+
+* Plugins can be installed from
+  * GUI
+  * jenkins-cli
+  * Upload file
+
+* Option to restart isn't available for plugin uninstall
+  * Need to select "prepare for shutdown" in "manage jenkins"
+  * Restart from the jenkins service on the host
+
+     ```shell
+     systemctl restart jenkins
+     ```
+* Check the plugins wiki for archive versions
+* Can install from file using the "Advanced Tab" in Plugin Manager
