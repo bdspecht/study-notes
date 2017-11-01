@@ -150,5 +150,22 @@ Differences between CI and CD
      ```shell
      systemctl restart jenkins
      ```
+
 * Check the plugins wiki for archive versions
+
 * Can install from file using the "Advanced Tab" in Plugin Manager
+
+### Projects
+
+#### Freestyle Project Configuration
+
+* Organize slaves using labels
+  * Can be used to organize by OS and distro
+* Can configure a job to only run on specific nodes with pattern matching
+  * ie. Linux && CentOS
+
+#### Parameterized Projects
+
+* Password parameters are not masked in console output
+
+#### Upstream/Downstream Projects
