@@ -169,3 +169,38 @@ Differences between CI and CD
 * Password parameters are not masked in console output
 
 #### Upstream/Downstream Projects
+
+* Can use the parameterized build trigger plugin to pass predefined builds downstream
+
+####Installing and configuring ANT
+
+* Pull the tarball 
+
+  * ```shell
+    wget http://www.us.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.tar.gz
+    ```
+
+* Unpack it to opt/
+
+  * ```shell
+    tar xvfz apache-ant-1.10.1-bin.tar.gz -C /opt
+    ```
+
+* Create the symlinks
+
+  * ```shell
+     ln -s /opt/apache-ant-1.10.1/ /opt/ant
+    ```
+
+* Set ANT_HOME
+
+  * ```shell
+    sh -c 'echo ANT_HOME=/opt/ant >> /etc/environment'
+    ```
+
+* Link binaries
+
+  * ```shell
+    ln -s /opt/ant/bin/ant /usr/bin/ant
+    ```
+
