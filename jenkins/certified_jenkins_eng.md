@@ -172,6 +172,8 @@ Differences between CI and CD
 
 * Can use the parameterized build trigger plugin to pass predefined builds downstream
 
+### Pipelines
+
 ####Installing and configuring ANT
 
 * Pull the tarball 
@@ -190,6 +192,9 @@ Differences between CI and CD
 
   * ```shell
      ln -s /opt/apache-ant-1.10.1/ /opt/ant
+     ```
+    ```
+
     ```
 
 * Set ANT_HOME
@@ -203,4 +208,19 @@ Differences between CI and CD
   * ```shell
     ln -s /opt/ant/bin/ant /usr/bin/ant
     ```
+
+
+#### The Jenkinsfile
+
+* Defines your continuous delivery pipeline
+* Lives within your source code (version controlled)
+* 2 Styles - Declarative and Scripted
+* Steps directive
+  * Tons of different steps associated with plugins
+  * "sh" for a shell script
+  * "echo" prints a string
+* Environment directive
+  * Sets environment variables
+
+#### Configuring and Running a Pipeline 
 
