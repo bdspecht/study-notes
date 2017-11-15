@@ -3,8 +3,9 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        sh 'ant -f build.xml -v'
+        sh 'ant -f jenkins/exercises/java-project/build.xml -v'
       }
     }
   }
 }
+438603b13de6e4c90baecd83045a8748a80784cf
