@@ -10,7 +10,7 @@ pipeline {
 
   post {
     always {
-      archive 'jenkins/exercises/java-project/dist/*.jar'
+      archiveArtifacts artifacts: 'jenkins/exercises/java-project/dist/*.jar', fingerprint: true
     }
   }
 }
