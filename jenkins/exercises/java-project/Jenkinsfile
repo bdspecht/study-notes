@@ -7,5 +7,10 @@ pipeline {
       }
     }
   }
+
+  post {
+    always {
+      archive 'jenkins/exercises/java-project/dist/*.jar'
+    }
+  }
 }
-438603b13de6e4c90baecd83045a8748a80784cf
