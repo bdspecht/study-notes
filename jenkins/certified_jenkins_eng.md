@@ -239,4 +239,3 @@ Differences between CI and CD
   * Code coverage
     * Testing for testing
 
-#### Unit Testing with JUnit and Ant
