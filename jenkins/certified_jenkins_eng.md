@@ -222,5 +222,21 @@ Differences between CI and CD
 * Environment directive
   * Sets environment variables
 
-#### Configuring and Running a Pipeline 
+### Testing
 
+#### About Testing
+
+* Common types of testing
+  * Unit testing
+    * Tests a small part of the code set, individual class if applicable
+  * Smoke test
+    * Sanity testing
+    * Smaller subset of tests to ensure the primary functionality works
+  * Integration testing
+    * Testing in which individual software modules are combined and tested as a group
+  * Acceptance testing
+    * The purpose of this test is to evaluate the system's compliance with the business requirements
+  * Code coverage
+    * Testing for testing
+
+#### Unit Testing with JUnit and Ant
