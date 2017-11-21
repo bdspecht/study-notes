@@ -6,7 +6,7 @@ pipeline {
       steps {
         sh 'ant -f jenkins/exercises/java-project/test.xml -v'
         junit 'jenkins/exercises/java-project/reports/result.xml'
-      } 
+      }
       agent {
         label 'apache'
       }
@@ -48,6 +48,17 @@ pipeline {
       }
       agent {
         docker 'openjdk:8u151-jre'
+      }
+    }
+    stage('Promote to Green') {
+      agent {
+        label 'apache'
+      }
+      when {
+        branch 'master'
+      }
+      steps {
+        sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
       }
     }
   }
