@@ -41,5 +41,14 @@ pipeline {
         label 'CentOS'
       }
     }
+    stage('Running on Debian') {
+      steps {
+        sh "wget http://bdspecht1.mylabserver.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+        sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+      }
+      agent {
+        docker 'openjdk:8u151-jre'
+      }
+    }
   }
 }
