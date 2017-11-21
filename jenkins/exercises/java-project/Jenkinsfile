@@ -18,6 +18,11 @@ pipeline {
       agent {
         label 'apache'
       }
+      post {
+        always {
+          archiveArtifacts artifacts: 'jenkins/exercises/java-project/dist/*.jar', fingerprint: true
+        }
+      }
     }
     stage('deploy') {
       steps {
@@ -35,12 +40,6 @@ pipeline {
       agent {
         label 'CentOS'
       }
-    }
-  }
-
-  post {
-    always {
-      archiveArtifacts artifacts: 'jenkins/exercises/java-project/dist/*.jar', fingerprint: true
     }
   }
 }
