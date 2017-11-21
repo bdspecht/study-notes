@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    label 'master'
-  }
+  agent none
 
   stages {
     stage('Unit Tests') {
@@ -9,15 +7,33 @@ pipeline {
         sh 'ant -f jenkins/exercises/java-project/test.xml -v'
         junit 'jenkins/exercises/java-project/reports/result.xml'
       } 
+      agent {
+        label 'apache'
+      }
     }
     stage('build') {
       steps {
         sh 'ant -f jenkins/exercises/java-project/build.xml -v'
       }
+      agent {
+        label 'apache'
+      }
     }
     stage('deploy') {
       steps {
         sh "cp jenkins/exercises/java-project/dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
+      }
+      agent {
+        label 'apache'
+      }
+    }
+    stage('Running on CentOS') {
+      steps {
+        sh "wget http://bdspecht1.mylabserver.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
+        sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+      }
+      agent {
+        label 'CentOS'
       }
     }
   }
