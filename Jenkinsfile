@@ -12,6 +12,18 @@ pipeline {
         sayHello 'Awesome student!'
       }
     }
+
+    stage('Git Information') {
+      agent any
+      steps {
+        echo "My Branch Name: ${env.BRANCH_NAME}"
+        script {
+          def myLib = new linuxacademy.git.gitStuff();
+          echo "My Commit: ${myLib.gitCommit("${env.WORKSPACE}/.git")}"
+        }
+
+      }
+    }
     stage('Unit Tests') {
       steps {
         sh 'ant -f jenkins/exercises/java-project/test.xml -v'
