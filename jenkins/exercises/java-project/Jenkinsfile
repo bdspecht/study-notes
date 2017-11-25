@@ -31,7 +31,7 @@ pipeline {
     stage('deploy') {
       steps {
         sh "mkdir /var/www/html/rectangles/all/${env.BRANCH_NAME}"
-        sh "cp jenkins/exercises/java-project/dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/${env.BRANCH_NAME}/"
+        sh "cp jenkins/exercises/java-project/dist/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/${env.BRANCH_NAME}/"
       }
       agent {
         label 'apache'
@@ -39,8 +39,8 @@ pipeline {
     }
     stage('Running on CentOS') {
       steps {
-        sh "wget http://bdspecht1.mylabserver.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
-        sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+        sh "wget http://bdspecht1.mylabserver.com/rectangles/all/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
+        sh "java -jar rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar 3 4"
       }
       agent {
         label 'CentOS'
@@ -48,8 +48,8 @@ pipeline {
     }
     stage('Running on Debian') {
       steps {
-        sh "wget http://bdspecht1.mylabserver.com/rectangles/all/rectangle_${env.BUILD_NUMBER}.jar"
-        sh "java -jar rectangle_${env.BUILD_NUMBER}.jar 3 4"
+        sh "wget http://bdspecht1.mylabserver.com/rectangles/all/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
+        sh "java -jar rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar 3 4"
       }
       agent {
         docker 'openjdk:8u151-jre'
