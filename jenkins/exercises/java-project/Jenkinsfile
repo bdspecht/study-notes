@@ -26,7 +26,8 @@ pipeline {
     }
     stage('deploy') {
       steps {
-        sh "cp jenkins/exercises/java-project/dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/"
+        sh "mkdir /var/www/html/rectangles/all/${env.BRANCH_NAME}"
+        sh "cp jenkins/exercises/java-project/dist/rectangle_${env.BUILD_NUMBER}.jar /var/www/html/rectangles/all/${env.BRANCH_NAME}/"
       }
       agent {
         label 'apache'
@@ -59,6 +60,26 @@ pipeline {
       }
       steps {
         sh "cp /var/www/html/rectangles/all/${env.BRANCH_NAME}/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar /var/www/html/rectangles/green/rectangle_${env.MAJOR_VERSION}.${env.BUILD_NUMBER}.jar"
+      }
+    }
+    stage('Promote Development Branch to Master') {
+      agent {
+        label 'apache'
+      }
+      when {
+        branch 'development'
+      }
+      steps {
+        echo "Stashing any local changes"
+        sh "git stash"
+        echo "Checking out development branch"
+        sh "git checkout development"
+        echo "Checking out master branch"
+        sh "git checkout master"
+        echo "Merging development into master branch"
+        sh "git merge development"
+        echo "Pushing to origin"
+        sh "git push origin master"
       }
     }
   }
