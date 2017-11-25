@@ -6,6 +6,12 @@ pipeline {
   }
 
   stages {
+    stage('Say Hello') {
+      agent any
+      steps {
+        sayHello 'Awesome student!'
+      }
+    }
     stage('Unit Tests') {
       steps {
         sh 'ant -f jenkins/exercises/java-project/test.xml -v'
