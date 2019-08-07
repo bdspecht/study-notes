@@ -207,4 +207,21 @@
   - Getting data out of a Kafka cluster is easy with Connect.
     - It has the ability to output to a file, Hadoop, Elasticsearch, and more
 
+## Kafka Administration
+### Topic Administration
+  - Topic configs - https://kafka.apache.org/documentation/#topicconfigs
+  - `__consumer_offsets` is a topic used internally to store the offsets
+  - List topics without a leader
+    - bin/kafka-topics.sh --zookeeper zookeeper1:2181/kafka --describe --unavailable-partitions
+
+### Topic Configurations
+  - Kafka Documentation - Managing Consumer Groups
+    - `https://kafka.apache.org/documentation/#basic_ops_consumer_group`
+  - List all the consumer groups
+    - `bin/kafka-consumer-groups.sh --bootstrap-server kafka1:9092 --list`
+  - Reset offsets for a consumer group
+    - `bin/kafka-consumer-groups.sh --bootstrap-server kafka:9092 --reset-offsets --group application1 --topic topic-1 --to-latest`
+
+## Storage Administration
+
 
