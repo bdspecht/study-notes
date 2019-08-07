@@ -187,3 +187,24 @@
       - Handles the storage of the schemas
       - Requires adding the dependency and plugin
     - Producer serializes the data, and consumer deserializes the data
+
+### Producers and Consumers
+#### Kafka Connect
+  - An API that interacts with the Kafka cluster, connects other datasources to your Kafka cluster
+  - Useful in cases where you don't have control of the producers or consumers
+  - Connectors
+    - Start the tasks to move large amounts of data in parallel to and from brokers
+  - Tasks
+    - Get data in and out of the Kafka cluster
+    - Receives context from the worker
+  - Workers
+    - Processes that run the container and tasks
+    - Handle HTTP requests to define connectors
+
+#### File Source and File Sink Connectors
+  - Sink Connector
+    - A sink connector delivers data from Kafka topics into secondary indexes (like Elasticsearch) or batch systems such as Hadoop for offline analysis
+  - Getting data out of a Kafka cluster is easy with Connect.
+    - It has the ability to output to a file, Hadoop, Elasticsearch, and more
+
+
