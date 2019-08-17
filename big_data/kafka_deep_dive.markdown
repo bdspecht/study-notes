@@ -209,12 +209,13 @@
 
 ## Kafka Administration
 ### Topic Administration
+#### Topic tools
   - Topic configs - https://kafka.apache.org/documentation/#topicconfigs
   - `__consumer_offsets` is a topic used internally to store the offsets
   - List topics without a leader
     - bin/kafka-topics.sh --zookeeper zookeeper1:2181/kafka --describe --unavailable-partitions
 
-### Topic Configurations
+#### Topic Configurations
   - Kafka Documentation - Managing Consumer Groups
     - `https://kafka.apache.org/documentation/#basic_ops_consumer_group`
   - List all the consumer groups
@@ -222,6 +223,152 @@
   - Reset offsets for a consumer group
     - `bin/kafka-consumer-groups.sh --bootstrap-server kafka:9092 --reset-offsets --group application1 --topic topic-1 --to-latest`
 
-## Storage Administration
+### Storage Administration
+#### File Formats and Indexes
+  - We'll see segment files accrue as messages are produced.
+    - You can set file compaction to maintain the over time.
+  - segment files
+    - Index file
+      - /data/kafa/foo/00000.index
+      - You can wipe out .index files and they'll be automatically recreated
+    - Log segment
+      - /data/kafka/foo/00000.log
+    - Compaction
+      - /data/kafka/foo/001.timeindex.deleted
+      - By default, messages are kept for one week and further compaction can occur
 
+#### File management
+  - Time retention
+    - `log.retention.hours`
+  - Size retention
+    - `log.retention.bytes`
+  - The segment we are currently writing to is called the active segment.
+    - The segment is deleted when it reaches a size of 1GB or has been inactive for 1 week, whichever comes first
+  - The Broker has an open file handle to each segment in every partition, even inactive segments
+      - Ensure the OS has appropriate open file limits
 
+#### Storage Structures
+  - Batch processing and operational workloads
+    - Lambda Architecture
+      - View real-time and historical data
+      - This adds difficulty due to the many simultaneous interfaces
+  - Version 1 and Version 2 in Parallel
+    - Kappa Architecture
+      - Switch your view as a cut-over
+      - This helps with migration or transitions to coninuous jobs
+  - Multi-Cluster
+    - Multiple Consumption
+      - Replicate clusters for scale
+      - Ingesting data from different Kafka clusters
+    - The potential upside is bandwidth savings
+  - Using EBS in AWS to move block volume if broker fails
+
+### Stream Processing
+#### How Streams Work
+  - A stream is nothing but a sequence of events
+  - Types of streams
+    - Credit card transactions
+    - Stock trades
+    - Package deliveries
+    - Network events
+    - Sensor events in manufacturing equipment
+    - Emails sent
+    - Moves in a game
+  - Brokers should be using the same timezone
+  - Two types of state
+    - Local (very fast)
+    - External (ie Cassandra DB)
+      - Unlimited size, access from different apps but latency issues
+  - Contain a history of changes
+  - Converting table to stream
+    - Turn insert, update, delete into streams
+
+#### Design Patterns
+  - Single event processing
+    - Filter pattern
+  - Local state processing
+  - Multiphase processing
+  - External processing
+  - Windowed join
+  - Out of sequence events
+
+#### Frameworks
+  - Ingest
+    - Gets data from one system to other
+    - Ingest problem, try Kafka Connect
+  - Low millisecond
+    - Works for applications requiring quick response
+    - Request-response
+  - Real-time data analytics
+    - Supports performing complex aggregation of data to gain insight
+  - Asynchronous microservices
+    - Performs a single action to serve a single need
+    - Requires local state caching events
+
+### Data Replication
+#### Multi-Cluster Architectures
+  - Never setup brokers in multiple regions
+  - Hub and spoke
+    - Multiple clusters (London, New York, AWS) send back to a central Kafka cluster
+  - Active-Active
+    - Apps write to a specific cluster, and data is synced between clusters
+  - Active-Standby
+    - All apps write to a single instance, and data is synced to slave
+
+#### MirrorMaker
+  - Tool to replicate your data to a different cluster
+    - Collection of consumers in a consumer group.
+      - The group reads data from the set of topics you specify and Mirromaker creastes the thread and sends it to the target cluster
+      - One thread per consumer
+  - Comes with the Kafka binaries and requires a lot of configuration for tuning the throughput
+  - Ensure there is a very low latency to produce the synchronization you need
+  - Configuration
+    - Typically installed as  a service
+    - *Always* runs at the destination datacenter
+    - Biggest task will be monitoring lag to ensure the destination cluster is not falling behind the source
+
+### Monitoring
+#### Cluster and Broker Monitoring
+  - Metrics for the application can be obtained from the JMX
+  - Kafka uses Yammer Metrics for metrics reporting
+
+#### Broker Metrics
+  - Active controller count
+    - Is the broker the controller?
+  - Request handler idle ratio
+    - How much load is the broker under?
+  - All topics bytes in
+    - Do I need to scale up the number of brokers?
+  - All topics bytes out
+    - How high is consumer traffic?
+  - All topics messages in
+    - How many messages per second?
+  - Partition count
+    - How many partitions are assigned to a broker?
+  - Leader count
+    - How many partitions is this broker a leader for?
+  - Offline partitions
+    - How many brokers have no leader?
+  - Request metrics
+    - How many requests are going to the broker?
+
+#### Java monitoring
+  - It's important to monitor the producers and consumers as well
+  - Important beans to include in your monitoring suite
+    - java.lang:type=GarbageCollector,name=G1 Old Generation
+    - java.lang:type=GarbageCollector,name=G1 Younug Generation
+      - # of GC cycles
+        - CollectionCount
+      - Time spent in GC cycle
+        - CollectionTime
+  - JVM can provide some OS information through the `java.lang:type=OperatingSystem` bean
+    - OpenFileDescriptorCount
+    - MaxFileDescriptorCount
+
+## Kafka Advanced Configuration
+### Advanced Producers
+  - To eliminate the possibility of duplicate messages, you can set `enable.idempotencea` to `true` and the consumer will delete duplicate messages
+    - You can use this to ensure your messages arrive in their entirety
+  - Producer configuration
+    - Kafka documentation indicates whether certain configurations are high importance or low
+    - Idempotence is listed as low importance due its effect on efficiency
