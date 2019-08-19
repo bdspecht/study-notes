@@ -372,3 +372,38 @@
   - Producer configuration
     - Kafka documentation indicates whether certain configurations are high importance or low
     - Idempotence is listed as low importance due its effect on efficiency
+
+### Batch Compression
+  - Sending a batch as opposed to invidual messages is very important in Kafka
+  - Sending larger batches with compression improves throughput
+  - Batch size and timing
+    - When multiple records are sent to the same partition, the producer can batch them together
+    - `batch.size` configuration option controls the amount of memory used for each batch
+    - `linger.ms` will help increase the batch size to get the best compression and throughput
+
+### Serializer
+  - Custom serialization can be sued to translave your data in a format that can be stored, transmitted, and retrieved
+  - It's recommended to use a generic serialization libraries
+    - Avro
+
+### Producer Buffer Memory
+ - If a producer is producing messages faster than the broker can recieve, the messages will be sent to a buffer in memory on the producer
+ - `max.block.ms` If the producer is sending messages to the broker and the broker is not responding for 60 seconds, either because its buffer is filled, or broker is down, you will get an exception
+
+### Advanced Consumers
+#### Reading duplicate messages
+  - A unique ID can be inserted into the code for the consumer, so that if a duplicate message is read, it is skipped and not committed twice.
+
+#### Tracking offsets
+  - Consumers work in a group to better coordinate the subscription of messages
+  - Tracking offsets is done by a coordinartor
+  - *commit*
+   - When a consumer updates its current position in the partition
+   - Produces a message to the *_consumer_offsets* topic
+  - If a consumer crashes, it will trigger a re-balance and the consumer amy be assigned a new set of partitions
+
+#### Partition rebalancing
+  - A rebalance occurs when a consumer is reassigned because it's etiher dead or added to a new consumer group
+  - Also occurs when a topic is modified
+
+
