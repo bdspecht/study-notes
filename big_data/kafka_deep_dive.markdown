@@ -406,4 +406,11 @@
   - A rebalance occurs when a consumer is reassigned because it's etiher dead or added to a new consumer group
   - Also occurs when a topic is modified
 
+### Advanced Topics
+#### Topic Design
+  - Design considerations
+    - Data accuracy
+      - Making sure that events that should be ordered should end up in the same topic/partition
+    - Popularity of events
+    - Amount of data to process
 
